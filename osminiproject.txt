@@ -1,0 +1,81 @@
+# Message class
+class Message:
+    def __init__(self, message_id, content):
+        self.message_id = message_id
+        self.content = content
+
+# Subscriber class
+class Subscriber:
+    def __init__(self, subscriber_id):
+        self.subscriber_id = subscriber_id
+
+# Dispatcher class
+class Dispatcher:
+    def __init__(self):
+        self.subscriptions = {}
+
+    def add_subscriber(self, message_id, subscriber):
+        subscribers = self.subscriptions.get(message_id, [])
+        subscribers.append(subscriber)
+        self.subscriptions[message_id] = subscribers
+
+    def remove_subscriber(self, message_id, subscriber):
+        if message_id in self.subscriptions:
+            subscribers = self.subscriptions[message_id]
+            subscribers.remove(subscriber)
+            if not subscribers:
+                del self.subscriptions[message_id]
+
+    def dispatch_message(self, message):
+        subscribers = self.subscriptions.get(message.message_id, [])
+        for subscriber in subscribers:
+            print(f"Message with ID {message.message_id} dispatched to subscriber {subscriber.subscriber_id}")
+            # Do something with the message for this subscriber
+            # ...
+
+# Publisher class
+class Publisher:
+    def __init__(self, publisher_id, dispatcher):
+        self.publisher_id = publisher_id
+        self.dispatcher = dispatcher
+
+    def publish_message(self, message):
+        print(f"Message with ID {message.message_id} published")
+        self.dispatcher.dispatch_message(message)
+
+# Main program
+def main():
+    dispatcher = Dispatcher()
+    publisher = Publisher(1, dispatcher)
+
+    while True:
+        print("1. Add subscriber")
+        print("2. Remove subscriber")
+        print("3. Publish message")
+        print("4. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            subscriber_id = int(input("Enter subscriber ID: "))
+            subscriber = Subscriber(subscriber_id)
+            message_id = int(input("Enter message ID to subscribe to: "))
+            dispatcher.add_subscriber(message_id, subscriber)
+        elif choice == "2":
+            subscriber_id = int(input("Enter subscriber ID: "))
+            subscriber = Subscriber(subscriber_id)
+            message_id = int(input("Enter message ID to unsubscribe from: "))
+            dispatcher.remove_subscriber(message_id, subscriber)
+        elif choice == "3":
+            message_id = int(input("Enter message ID: "))
+            content = input("Enter message content: ")
+            message = Message(message_id, content)
+            publisher.publish_message(message)
+        elif choice == "4":
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
